@@ -1,0 +1,67 @@
+#Ten projekt polega na automatyzacji procesu dodawania logo do obrazów oraz ich skalowania. Skrypt będzie przetwarzał wszystkie obrazy w bieżącym katalogu roboczym, zmniejszał je do określonych wymiarów (jeśli są większe) i dodawał logo w prawym dolnym rogu. Następnie zapisze zmodyfikowane obrazy w nowym folderze.
+
+pip install pillow
+
+import os
+from PIL import Image
+
+# Stałe
+SQUARE_FIT_SIZE = 300
+LOGO_FILENAME = 'catlogo.png'
+
+# Otwieranie logo jako obiektu Image
+logoIm = Image.open(LOGO_FILENAME)
+logoWidth, logoHeight = logoIm.size
+
+# Tworzenie katalogu na obrazy z logo
+os.makedirs('withLogo', exist_ok=True)
+
+# Pętla przetwarzająca wszystkie pliki w bieżącym katalogu
+for filename in os.listdir('.'):
+    # Pomijanie plików, które nie są obrazami lub są logiem
+    if not (filename.endswith('.png') or filename.endswith('.jpg')) or filename == LOGO_FILENAME:
+        continue
+    
+    im = Image.open(filename)
+    width, height = im.size
+
+    # Sprawdzanie, czy obraz wymaga zmiany rozmiaru
+    if width > SQUARE_FIT_SIZE or height > SQUARE_FIT_SIZE:
+        # Przeliczanie nowych wymiarów obrazu
+        if width > height:
+            height = int((SQUARE_FIT_SIZE / width) * height)
+            width = SQUARE_FIT_SIZE
+        else:
+            width = int((SQUARE_FIT_SIZE / height) * width)
+            height = SQUARE_FIT_SIZE
+        
+        # Zmiana rozmiaru obrazu
+        print(f'Resizing {filename}...')
+        im = im.resize((width, height))
+
+    # Dodawanie logo do obrazu
+    print(f'Adding logo to {filename}...')
+    im.paste(logoIm, (width - logoWidth, height - logoHeight), logoIm)
+
+    # Zapisywanie zmodyfikowanego obrazu
+    im.save(os.path.join('withLogo', filename))
+
+print('Done!')
+
+
+#Instrukcje krok po kroku:
+#Importowanie bibliotek: Skrypt zaczyna od importowania bibliotek os do zarządzania plikami i PIL z pakietu Pillow do manipulacji obrazami.
+
+#Definiowanie stałych: SQUARE_FIT_SIZE określa maksymalny rozmiar obrazu (300x300 pikseli), a LOGO_FILENAME wskazuje na plik logo, które będzie dodane do obrazów.
+
+#Otwieranie logo: Logo jest otwierane jako obiekt Image, a jego wymiary są przechowywane w logoWidth i logoHeight.
+
+#Tworzenie folderu docelowego: Skrypt tworzy nowy folder o nazwie withLogo na zmodyfikowane obrazy, jeśli taki folder jeszcze nie istnieje.
+
+#Pętla przetwarzająca pliki: Skrypt przechodzi przez wszystkie pliki w bieżącym katalogu. Jeśli plik nie jest obrazem .png lub .jpg albo jest plikiem logo, jest pomijany.
+
+#Sprawdzanie i zmiana rozmiaru: Jeśli obraz jest większy niż 300x300 pikseli, jego wymiary są przeliczane proporcjonalnie, aby zmieścić się w tym kwadracie.
+
+#Dodawanie logo: Logo jest wklejane w prawy dolny róg obrazu.
+
+#Zapisywanie zmodyfikowanego obrazu: Obraz z dodanym logo jest zapisywany w folderze withLogo.
