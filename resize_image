@@ -1,0 +1,58 @@
+import os
+from PIL import Image
+
+# Ustawienia
+SQUARE_FIT_SIZE = 300
+LOGO_FILENAME = 'catlogo.png'
+
+# Otwórz logo
+logoIm = Image.open(LOGO_FILENAME)
+logoWidth, logoHeight = logoIm.size
+
+# Utwórz folder na obrazy z logo
+os.makedirs('withLogo', exist_ok=True)
+
+# Przetwórz wszystkie pliki w katalogu roboczym
+for filename in os.listdir('.'):
+    # Sprawdź, czy plik jest obrazem w formacie PNG, JPEG, GIF lub BMP
+    if not (filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))):
+        continue  # pomiń pliki, które nie są obrazami
+
+    # Otwórz obraz
+    im = Image.open(filename)
+    width, height = im.size
+
+    # Sprawdź, czy obraz jest większy niż 300x300 pikseli i jeśli tak, przeskaluj go
+    if width > SQUARE_FIT_SIZE or height > SQUARE_FIT_SIZE:
+        if width > height:
+            height = int((SQUARE_FIT_SIZE / width) * height)
+            width = SQUARE_FIT_SIZE
+        else:
+            width = int((SQUARE_FIT_SIZE / height) * width)
+            height = SQUARE_FIT_SIZE
+        print(f'Resizing {filename}...')
+        im = im.resize((width, height))
+
+    # Sprawdź, czy obraz jest co najmniej dwa razy większy niż logo
+    if width >= 2 * logoWidth and height >= 2 * logoHeight:
+        print(f'Adding logo to {filename}...')
+        im.paste(logoIm, (width - logoWidth, height - logoHeight), logoIm)
+    else:
+        print(f'Skipping logo for {filename} (image too small)...')
+
+    # Zapisz zmodyfikowany obraz do folderu 'withLogo'
+    im.save(os.path.join('withLogo', filename))
+
+
+
+#Omówienie zmian:
+#Rozszerzenie obsługi formatów obrazów:
+
+#Program został zmodyfikowany tak, aby przetwarzał obrazy w formatach PNG, JPEG, GIF i BMP. Użyto funkcji filename.lower().endswith(...), aby upewnić się, że sprawdzanie rozszerzeń plików jest niewrażliwe na wielkość liter.
+#Obsługa rozszerzeń plików zapisanych wielkimi literami:
+
+#W celu obsługi plików z rozszerzeniami zapisanymi wielkimi literami, wszystkie sprawdzenia rozszerzeń zostały zmodyfikowane za pomocą metody .lower(), aby były niewrażliwe na wielkość liter.
+#Sprawdzanie wielkości obrazu przed dodaniem logo:
+
+#Program został zmodyfikowany, aby logo było dodawane tylko wtedy, gdy obraz ma co najmniej dwa razy większą szerokość i wysokość niż logo. Jeśli obraz jest zbyt mały, program pomija dodawanie logo i wyświetla odpowiedni komunikat.
+#Dzięki tym zmianom program jest bardziej wszechstronny i bezpieczniejszy w użyciu, obsługując więcej formatów plików i lepiej radząc sobie z różnymi przypadkami.
