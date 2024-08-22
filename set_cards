@@ -1,0 +1,77 @@
+from PIL import Image, ImageDraw, ImageFont
+import os
+
+# Wymiary karty w pikselach (4x5 cali, 72 piksele na cal)
+CARD_WIDTH = 288
+CARD_HEIGHT = 360
+
+# Czarny prostokąt jako linia cięcia
+BORDER_SIZE = 10
+
+# Dekoracja kwiatowa
+FLOWER_IMAGE_PATH = 'flower.png'
+# Czcionka (musisz mieć odpowiedni plik czcionki TTF)
+FONT_PATH = 'arial.ttf'
+FONT_SIZE = 36
+
+# Wczytanie listy gości z pliku tekstowego
+with open('guests.txt') as f:
+    guests = f.readlines()
+
+# Wczytanie obrazu dekoracji kwiatowej
+flower_image = Image.open(FLOWER_IMAGE_PATH)
+
+# Przetwarzanie każdego gościa
+for guest in guests:
+    guest = guest.strip()  # Usunięcie białych znaków z nazwiska
+
+    # Tworzenie nowego obrazu dla karty miejsc
+    card_image = Image.new('RGBA', (CARD_WIDTH, CARD_HEIGHT), 'white')
+    draw = ImageDraw.Draw(card_image)
+
+    # Rysowanie czarnego prostokąta wokół karty jako linii cięcia
+    draw.rectangle(
+        [BORDER_SIZE, BORDER_SIZE, CARD_WIDTH - BORDER_SIZE, CARD_HEIGHT - BORDER_SIZE],
+        outline='black'
+    )
+
+    # Wstawianie dekoracji kwiatowej
+    flower_resized = flower_image.resize((100, 100))
+    card_image.paste(flower_resized, (int((CARD_WIDTH - 100) / 2), 50), flower_resized)
+
+    # Dodanie imienia gościa
+    font = ImageFont.truetype(FONT_PATH, FONT_SIZE)
+    text_width, text_height = draw.textsize(guest, font=font)
+    text_x = int((CARD_WIDTH - text_width) / 2)
+    text_y = int((CARD_HEIGHT + 100) / 2) - int(text_height / 2)
+    draw.text((text_x, text_y), guest, fill='black', font=font)
+
+    # Zapisanie obrazu karty miejsc
+    output_filename = f'{guest}_placecard.png'
+    card_image.save(output_filename)
+
+    print(f'Utworzono kartę miejsc dla: {guest}')
+
+print("Wszystkie karty miejsc zostały wygenerowane.")
+#Omówienie kodu:
+#Ustawienia rozmiaru karty:
+
+#Karta ma wymiary 288×360 pikseli (4×5 cali).
+#Dekoracja kwiatowa i czcionka:
+
+#Obraz kwiatowy (flower.png) jest wczytywany i skalowany do odpowiednich rozmiarów.
+#Czcionka (arial.ttf) musi być dostępna w katalogu, w którym uruchamiany jest skrypt.
+#Generowanie kart:
+
+#Program wczytuje listę gości z pliku guests.txt.
+#Dla każdego gościa tworzona jest nowa karta miejsc, na której znajduje się jego imię oraz dekoracja kwiatowa.
+#Rysowanie prostokąta jako linii cięcia:
+
+#Prostokąt wokół krawędzi karty służy jako linia cięcia przy wydruku.
+#Dodanie imienia gościa:
+
+#Imię gościa jest dodawane na karcie w centrum dolnej części karty.
+#Zapisanie plików PNG:
+
+#Każda karta miejsc jest zapisywana jako plik PNG z nazwą gościa.
+#Po uruchomieniu programu wszystkie karty miejsc zostaną wygenerowane jako osobne pliki obrazów, gotowe do wydruku.
