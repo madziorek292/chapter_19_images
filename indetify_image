@@ -1,0 +1,64 @@
+import os
+from PIL import Image
+
+def is_photo_file(filename):
+    # Sprawdza, czy plik ma rozszerzenie .png lub .jpg
+    return filename.lower().endswith(('.png', '.jpg'))
+
+def is_large_image(image_path):
+    # Sprawdza, czy obraz ma szerokość i wysokość większą niż 500 pikseli
+    try:
+        with Image.open(image_path) as img:
+            width, height = img.size
+            return width > 500 and height > 500
+    except Exception as e:
+        return False
+
+def find_photo_folders(start_path):
+    for foldername, subfolders, filenames in os.walk(start_path):
+        numPhotoFiles = 0
+        numNonPhotoFiles = 0
+
+        for filename in filenames:
+            if not is_photo_file(filename):
+                numNonPhotoFiles += 1
+                continue
+
+            file_path = os.path.join(foldername, filename)
+            if is_large_image(file_path):
+                numPhotoFiles += 1
+            else:
+                numNonPhotoFiles += 1
+
+        # Sprawdza, czy więcej niż połowa plików w folderze to zdjęcia
+        total_files = numPhotoFiles + numNonPhotoFiles
+        if total_files > 0 and numPhotoFiles > total_files / 2:
+            print(f"Folder ze zdjęciami znaleziony: {os.path.abspath(foldername)}")
+
+# Uruchom program, przeszukując cały dysk (zmień ścieżkę na odpowiednią dla twojego systemu)
+find_photo_folders('C:\\')
+
+
+
+#Masz nawyk przenoszenia plików z aparatu cyfrowego do tymczasowych folderów na dysku twardym, a następnie zapominasz o tych folderach. Przydatne byłoby napisanie programu, który przeszukuje cały dysk twardy i znajduje te zaległe "foldery ze zdjęciami".
+
+#Definicja folderu ze zdjęciami:
+
+#Folder, w którym ponad połowa plików to zdjęcia.
+#Plik zdjęcia to plik o rozszerzeniu .png lub .jpg, a jego szerokość i wysokość muszą być większe niż 500 pikseli.
+
+#Funkcja is_photo_file(filename):
+
+#Sprawdza, czy plik ma rozszerzenie .png lub .jpg. Użycie metody lower() zapewnia, że rozszerzenia są rozpatrywane bez względu na wielkość liter.
+#Funkcja is_large_image(image_path):
+
+#Otwiera plik obrazu przy użyciu modułu Pillow (Image.open) i sprawdza, czy jego szerokość i wysokość są większe niż 500 pikseli. Jeśli obraz jest zbyt mały lub nie można go otworzyć, funkcja zwraca False.
+#Funkcja find_photo_folders(start_path):
+
+#Przeszukuje wszystkie foldery, począwszy od ścieżki start_path (np. C:\\), używając os.walk().
+#Dla każdego folderu liczy liczbę plików zdjęć i plików niebędących zdjęciami.
+#Jeśli więcej niż połowa plików w folderze to zdjęcia, drukuje ścieżkę do tego folderu.
+#Wywołanie programu:
+
+#Program jest uruchamiany od przeszukania całego dysku (C:\\). Możesz zmienić ścieżkę na odpowiednią dla twojego systemu operacyjnego.
+#Ten program automatycznie znajdzie foldery, które mogą zawierać zdjęcia na podstawie określonych kryteriów, co ułatwia zarządzanie i organizowanie zdjęć na komputerze.
